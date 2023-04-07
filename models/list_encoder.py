@@ -38,9 +38,10 @@ class lseq_encode(nn.Module):
       e = learned_emb
     sent_lens, idxs = ilens.sort(descending=True)
     e = e.index_select(0,idxs)
-    e = pack_padded_sequence(e,sent_lens,batch_first=True)
-    e, (h,c) = self.encoder(e)
-    e = pad_packed_sequence(e,batch_first=True)[0]
+    e = pack_padded_sequence(e.cpu(),sent_lens.cpu(),batch_first=True)
+    e, (h,c) = self.encoder(e.cuda())
+    e = pad_packed_sequence(e.cpu(),batch_first=True)[0]
+    e=e.cuda()
     e = torch.zeros_like(e).scatter(0,idxs.unsqueeze(1).unsqueeze(1).expand(-1,e.size(1),e.size(2)),e)
     h = h.transpose(0,1)
     h = torch.zeros_like(h).scatter(0,idxs.unsqueeze(1).unsqueeze(1).expand(-1,h.size(1),h.size(2)),h)
@@ -65,4 +66,3 @@ class list_encode(nn.Module):
     encs = [self.pad(x,m) for x in enc.split(batch_lens)]
     out = torch.stack(encs,0)
     return out
-
