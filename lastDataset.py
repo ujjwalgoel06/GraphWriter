@@ -90,12 +90,12 @@ class dataset:
     print('building vocab')
 
     self.OUTP.build_vocab(train, min_freq=args.outunk)   
-    generics =['<method>','<material>','<otherscientificterm>','<metric>','<task>']
+    generics =['<method>','<material>','<otherscientificterm>','<metric>','<task>','<generic>']
     self.OUTP.vocab.itos.extend(generics)
     for x in generics:
       self.OUTP.vocab.stoi[x] = self.OUTP.vocab.itos.index(x)
     self.TGT.vocab = copy(self.OUTP.vocab)
-    specials = "method material otherscientificterm metric task".split(" ")
+    specials = "method material otherscientificterm metric task generic".split(" ")
     for x in specials:
       for y in range(40):
         s = "<"+x+"_"+str(y)+">"
